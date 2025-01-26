@@ -1,0 +1,53 @@
+module inter_and_intra_assignment_delay;
+
+reg [2:0] a,b,c,d,e;
+
+initial
+begin
+a=#10 3'b000;
+#10 b=#10 3'b001;
+#10 c<=#10 3'b010;
+#10 d<=#10 3'b011;
+#10 e=#10 3'b100;
+end
+
+initial
+$monitor("a=%0b,b=%0b, c=%0b, d=%0b, e=%0b", a,b,c,d,e,$time);
+
+endmodule
+
+In the above code a executes at 10 ns and after 10ns b starts executiona but there is delay of 10ns(intra assignment delay) so b is updated at 30ns and now the actual picture starts
+after that we have non blocking statement #10 b=#10 3'b001;
+                                              #10 c<=#10 3'b010;
+                                              #10 d<=#10 3'b011; after execution of b 10 ns inter assignment delay is executed then only c starts excutes due to the quality of inter assignment delay,
+                                              but while executing intra assignment delay with non blocking along with c 10ns intra assignment delay is executed parallely so c is updated at 50 and d is updated at 60 but
+                                              #10 d<=#10 3'b011;
+                                              #10 e=#10 3'b100; the intra assignment delay of d and inter assignment delay works parllely and e is updated at 70 ns
+                                              finally remember that in both blocking and non blocking inter assignment dealy blocks the statement until the delay gets completed.
+module inter_and_intra_assignment_delay;
+
+reg [2:0] a,b,c,d,e;
+
+initial
+begin
+a=#10 3'b000;
+#10 
+b=#10 3'b001;
+#10 
+c<=#10 3'b010;// after completing 36 th line both intra and inter assignment delay works parllely because in nonblocking statements works prallely so d starts execution at 60 but 38 th line delay stops execution because the iner assignment delay stops exection until the delay completes
+#10 
+d<=#10 3'b011;// 39 th line intra assignment and inter assignment delay at 40 works parllely because we have non bocling assignment at line 39 and after line 40 e starts evaluting
+#10
+e=#10 3'b100;
+end
+
+initial
+$monitor("a=%0b,b=%0b, c=%0b, d=%0b, e=%0b", a,b,c,d,e,$time);
+
+endmodule
+
+NOTE: 
+1 inter assignemt delay works as blocking assignment it does not allow the below line until it completes the delay weather the below is blocking or non blocking assignment.
+2. in non blocking intra and inter assignment delays work parllely as (c<=#10 3'b010;
+                                                                        #10 ) this one works. 
+                                              
